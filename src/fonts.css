@@ -1,0 +1,55 @@
+@font-face {
+  font-family: "Onest";
+  font-weight: 100;
+  font-style: normal;
+  src: url("./assets/OnestThin.woff") format("woff");
+}
+
+@font-face {
+  font-family: "Onest";
+  font-weight: 300;
+  font-style: normal;
+  src: url("./assets/OnestLight.woff") format("woff");
+}
+
+@font-face {
+  font-family: "Onest";
+  font-weight: 400;
+  font-style: normal;
+  src: url("./assets/OnestRegular.woff") format("woff");
+}
+
+@font-face {
+  font-family: "Onest";
+  font-weight: 500;
+  font-style: normal;
+  src: url("./assets/OnestMedium.woff") format("woff");
+}
+
+@font-face {
+  font-family: "Onest";
+  font-weight: 700;
+  font-style: normal;
+  src: url("./assets/OnestBold.woff") format("woff");
+}
+
+@font-face {
+  font-family: "Onest";
+  font-weight: 800;
+  font-style: normal;
+  src: url("./assets/OnestExtraBold.woff") format("woff");
+}
+
+@font-face {
+  font-family: "Onest";
+  font-weight: 900;
+  font-style: normal;
+  src: url("./assets/OnestBlack.woff") format("woff");
+}
+
+@font-face {
+  font-family: "Pretendard Variable";
+  font-weight: 100 900;
+  font-style: normal;
+  src: local("Pretendard Variable"), url("./assets/PretendardVariable.woff2") format("woff2-variations");
+}
