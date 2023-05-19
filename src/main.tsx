@@ -1,10 +1,12 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import "./fonts.css";
-import "./index.css";
+import { AnimatePresence } from "framer-motion";
 import Index from "./pages";
 import Search from "./pages/search";
+
+import "./fonts.css";
+import "./index.css";
 
 const router = createBrowserRouter([
   { path: "/", element: <Index /> },
@@ -13,6 +15,8 @@ const router = createBrowserRouter([
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
   <React.StrictMode>
-    <RouterProvider router={router} />
+    <AnimatePresence mode="wait">
+      <RouterProvider router={router} />
+    </AnimatePresence>
   </React.StrictMode>
 );

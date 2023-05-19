@@ -1,27 +1,35 @@
 import { BoltIcon, ChartBarIcon, ChatBubbleLeftIcon } from "@heroicons/react/24/solid";
 import { Form } from "react-router-dom";
+import { motion } from "framer-motion";
 import Nav from "../components/common/Nav";
 import { ReactComponent as DaisyIcon } from "../assets/daisy-mask.svg";
+
+const MotionForm = motion(Form);
 
 function Index() {
   return (
     <div>
-      <Nav />
+      <Nav hideLogo={true} />
       <section className="max-w-3xl mx-auto py-40">
         <div className="flex flex-col items-center w-full">
-          <h2 className="text-3xl text-black/70 font-bold font-display text-center leading-8">
+          <motion.h2
+            className="text-3xl text-black/70 font-bold font-display text-center leading-8"
+            layoutId="subtitle"
+          >
             엔트리 라이프를
             <br />
             200% 즐기는 방법
-          </h2>
-          <h1 className="text-8xl font-bold font-display leading-none">dut.life</h1>
-          <Form className="max-w-2xl w-full mx-auto mt-6" action="/search">
+          </motion.h2>
+          <motion.h1 className="text-8xl font-bold font-display leading-none" layoutId="logo">
+            dut.life
+          </motion.h1>
+          <MotionForm className="max-w-2xl w-full mx-auto mt-6" action="/search" layoutId="searchForm">
             <input
               className="bg-gray-100 text-lg font-normal outline-none px-5 py-3 rounded-2xl flex w-full"
               name="q"
-              placeholder="유저, 작품, 또는 커뮤니티 글 검색"
+              placeholder="유저, 작품, 커뮤니티, 스티커, 또는 스크립트 검색"
             />
-          </Form>
+          </MotionForm>
         </div>
       </section>
       <section className="max-w-5xl mx-auto">
