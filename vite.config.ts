@@ -21,6 +21,6 @@ export default defineConfig({
   plugins: [
     svgr(),
     react(),
-    mix({ handler: './src/handler.ts', adapter: vercelAdapter() }),
+    mix({ handler: './src/handler.mts', adapter: vercelAdapter() }),
   ],
 });
