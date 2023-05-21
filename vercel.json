@@ -1,0 +1,6 @@
+{
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/" },
+    { "source": "/trpc", "destination": "https://api.dut.life/trpc" }
+  ]
+}
