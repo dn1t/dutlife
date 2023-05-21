@@ -1,0 +1,3 @@
+[submodule "dutlife-api"]
+	path = dutlife-api
+	url = https://github.com/thoratica/dutlife-api
