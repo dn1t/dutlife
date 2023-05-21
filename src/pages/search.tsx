@@ -4,12 +4,6 @@ import { motion, useAnimationControls } from 'framer-motion';
 import { trpc } from '../utils/trpc';
 import Nav from '../components/common/Nav';
 
-interface SearchResult {
-  title: string;
-  href: string;
-  description: string;
-}
-
 export const FADE_DOWN_ANIMATION_VARIANTS = {
   hidden: { opacity: 0, y: -10 },
   show: { opacity: 1, y: 0, transition: { type: 'spring' } },
