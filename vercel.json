@@ -1,8 +1,8 @@
 {
   "rewrites": [
-    { "source": "/(.*)", "destination": "/" },
     { "source": "/trpc", "destination": "https://api.dut.life/trpc" },
     { "source": "/trpc/:path*", "destination": "https://api.dut.life/trpc/:path*" },
-    { "source": "/trpc/:path*/", "destination": "https://api.dut.life/trpc/:path*/" }
+    { "source": "/trpc/:path*/", "destination": "https://api.dut.life/trpc/:path*/" },
+    { "source": "/(.*)", "destination": "/" }
   ]
 }
