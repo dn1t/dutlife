@@ -1,55 +1,56 @@
 import { useEffect } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
+import {
+  Link,
+  useLocation,
+  useParams,
+  useSearchParams,
+} from 'react-router-dom';
 import { motion, useAnimationControls } from 'framer-motion';
 import { trpc } from '../utils/trpc';
 import { FADE_DOWN_ANIMATION_VARIANTS } from '../utils/constants';
 import Nav from '../components/common/Nav';
 
-function getCategory(code: string) {
-  switch (code) {
-    case 'free':
-      return '엔트리 이야기';
-    case 'qna':
-      return '묻고 답하기';
-    case 'tips':
-      return '노하우 & 팁';
-    case 'suggestion':
-      return '제안 및 건의';
-    case 'report':
-      return '(구) 제안 및 건의';
-    case 'notice':
-      return '공지사항';
-    default:
-      return code;
-  }
-}
-
-function Search() {
+function User() {
+  const { state } = useLocation();
+  const { username } = useParams();
   const [searchParams] = useSearchParams();
-  const query = searchParams.get('q');
   const controls = useAnimationControls();
 
-  const searchQuery = trpc.search.useQuery({ query, display: 6 });
+  const userInfoQuery = trpc.userInfo.useQuery({ username });
+  const user:
+    | {
+        username: string;
+        id: string;
+        nickname: string;
+        description: string;
+        profileImage?: string | undefined;
+        coverImage?: string | undefined;
+        followers: number;
+        followings: number;
+        badges: {
+          image: string;
+          label: string;
+        }[];
+      }
+    | undefined = userInfoQuery.data ?? state?.userInfo;
 
   useEffect(() => {
-    if (!searchQuery.data) return;
+    if (!userInfoQuery.data) return;
+    if (state?.userInfo) {
+      window.history.replaceState({}, document.title);
+      return;
+    }
 
     controls.start('show');
-  }, [searchQuery.data]);
+  }, [userInfoQuery.data, state]);
 
   return (
     <>
-      <Nav query={query ?? undefined} />
-      <motion.div className='max-w-3xl mx-auto flex flex-col items-start'>
-        <motion.h2
-          className='mb-4 text-lg text-black/70 text-center font-medium font-display leading-8'
-          layoutId='subtitle'
-        >
-          "{query}"에 대한 검색 결과
-        </motion.h2>
+      <Nav query={username ?? undefined} />
+      <motion.div className='flex flex-col items-start' layoutId='container'>
         <motion.div
           className='flex flex-col w-full gap-y-7 pb-10'
-          initial='hidden'
+          initial={state?.userInfo ? 'show' : 'hidden'}
           animate={controls}
           viewport={{ once: true }}
           variants={{
@@ -58,110 +59,102 @@ function Search() {
           }}
         >
           <motion.section variants={FADE_DOWN_ANIMATION_VARIANTS}>
-            {searchQuery.data?.users && searchQuery.data.users.length > 0 && (
-              <>
-                <h2 className='text-2xl font-bold mb-2'>유저</h2>
-                <ul className='flex flex-col gap-y-3'>
-                  {searchQuery.data.users.map((user) => (
-                    <li key={user.id}>
-                      <Link
-                        to={`/user/${user.username}`}
-                        state={{ userInfo: user }}
-                        className='flex flex-col w-full h-max rounded-xl shadow'
+            <div className='flex flex-col w-full h-max'>
+              <motion.div
+                className='w-full h-44 bg-center bg-[auto_105%] bg-[#16d8a3] brightness-75'
+                style={{
+                  backgroundImage: `url(${user?.coverImage})`,
+                }}
+                layoutId={`user_${username}_coverImage`}
+              />
+              <div className='max-w-5xl mx-auto flex flex-col w-full h-max pb-3'>
+                <div className='relative mb-6'>
+                  <motion.img
+                    src={
+                      user?.profileImage ??
+                      'https://playentry.org/img/DefaultCardUserThmb.svg'
+                    }
+                    alt={`${user?.nickname}의 프로필 사진`}
+                    className='w-24 h-24 rounded-full absolute -top-16 outline outline-4 outline-zinc-50 object-cover'
+                    height={96}
+                    width={96}
+                    layoutId={`user_${username}_profileImage`}
+                  />
+                </div>
+                <div className='relative px-6'>
+                  <motion.div
+                    className='flex justify-end gap-x-2 absolute -top-6 right-0'
+                    layoutId={`user_${username}_badges`}
+                  >
+                    {user?.badges.map((badge) => (
+                      <div
+                        className='w-[36px] aspect-[68/116]'
+                        key={badge.image}
                       >
-                        <div className='rounded-xl overflow-hidden'>
-                          <motion.div
-                            className='w-full h-28 bg-center bg-[auto_105%] bg-[#16d8a3] brightness-75'
-                            style={{
-                              backgroundImage: `url(${user.coverImage})`,
-                            }}
-                            layoutId={`user_${user.username}_coverImage`}
-                          />
-                          <div className='flex flex-col w-full h-max bg-zinc-50 px-6 pb-3 shadow'>
-                            <div className='relative mb-6'>
-                              <motion.img
-                                src={
-                                  user.profileImage ??
-                                  'https://playentry.org/img/DefaultCardUserThmb.svg'
-                                }
-                                alt={`${user.nickname}의 프로필 사진`}
-                                className='w-[72px] h-[72px] rounded-full absolute -top-12 outline outline-4 outline-zinc-50 object-cover'
-                                layoutId={`user_${user.username}_profileImage`}
-                              />
-                            </div>
-                            <div className='relative px-6'>
-                              <motion.div
-                                className='flex justify-end gap-x-2 absolute -top-6 right-0'
-                                layoutId={`user_${user.username}_badges`}
-                              >
-                                {user.badges.map((badge) => (
-                                  <div
-                                    className='w-[30px] aspect-[68/116]'
-                                    key={badge.image}
-                                  >
-                                    <img
-                                      src={badge.image}
-                                      alt={badge.label}
-                                      key={badge.image}
-                                    />
-                                  </div>
-                                ))}
-                              </motion.div>
-                            </div>
-                            <motion.h3
-                              className='flex items-baseline mt-1.5 px-1'
-                              layoutId={`user_${user.username}_name`}
-                            >
-                              <span className='text-2xl font-bold'>
-                                {user.nickname}
-                              </span>
-                              <span className='text-xl text-zinc-500 font-medium ml-1.5'>
-                                @{user.username}
-                              </span>
-                            </motion.h3>
-                            <motion.div
-                              className='flex gap-x-2 px-1'
-                              layoutId={`user_${user.username}_follows`}
-                            >
-                              <span>
-                                <span className='text-zinc-500'>
-                                  팔로잉&nbsp;
-                                </span>
-                                <span className='text-blue-500 font-medium'>
-                                  {user.followings}
-                                </span>
-                              </span>
-                              <span>
-                                <span className='text-zinc-500'>
-                                  팔로워&nbsp;
-                                </span>
-                                <span className='text-blue-500 font-medium'>
-                                  {user.followers}
-                                </span>
-                              </span>
-                            </motion.div>
-                            <motion.div
-                              className='mt-1 px-1'
-                              layoutId={`user_${user.username}_description`}
-                            >
-                              {user.description}
-                            </motion.div>
-                          </div>
-                        </div>
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              </>
-            )}
+                        <img
+                          src={badge.image}
+                          alt={badge.label}
+                          key={badge.image}
+                        />
+                      </div>
+                    ))}
+                  </motion.div>
+                </div>
+                <motion.h3
+                  className='flex items-baseline mt-4 px-1'
+                  layoutId={`user_${username}_name`}
+                >
+                  <span className='text-3xl font-bold'>{user?.nickname}</span>
+                  <span className='text-2xl text-zinc-500 font-medium ml-1.5'>
+                    @{user?.username}
+                  </span>
+                </motion.h3>
+                <motion.div
+                  className='flex gap-x-2 px-1'
+                  layoutId={`user_${username}_follows`}
+                >
+                  <span>
+                    <span className='text-zinc-500 text-lg'>팔로잉&nbsp;</span>
+                    <span className='text-blue-500 text-lg font-medium'>
+                      {user?.followings}
+                    </span>
+                  </span>
+                  <span>
+                    <span className='text-zinc-500 text-lg'>팔로워&nbsp;</span>
+                    <span className='text-blue-500 text-lg font-medium'>
+                      {user?.followers}
+                    </span>
+                  </span>
+                </motion.div>
+                <motion.div
+                  className='text-lg mt-1 px-1'
+                  layoutId={`user_${username}_description`}
+                >
+                  {user?.description}
+                </motion.div>
+              </div>
+            </div>
           </motion.section>
-          <motion.section variants={FADE_DOWN_ANIMATION_VARIANTS}>
-            {searchQuery.data?.projects?.list &&
-              searchQuery.data.projects.list.length > 0 && (
+          {/* <motion.section variants={FADE_DOWN_ANIMATION_VARIANTS}>
+            {userInfoQuery.data?.users &&
+              userInfoQuery.data.users.length > 0 && (
+                <>
+                  <h2 className='text-2xl font-bold mb-2'>유저</h2>
+                  <ul className='flex flex-col gap-y-3'>
+                    {userInfoQuery.data.users.map((user) => (
+                      <li key={user?.id}></li>
+                    ))}
+                  </ul>
+                </>
+              )}
+          </motion.section> */}
+          {/* <motion.section variants={FADE_DOWN_ANIMATION_VARIANTS}>
+            {userInfoQuery.data?.projects?.list &&
+              userInfoQuery.data.projects.list.length > 0 && (
                 <>
                   <h2 className='text-2xl font-bold mb-2'>작품</h2>
                   <ul className='grid grid-cols-3 gap-3'>
-                    {searchQuery.data.projects.list.map((project) => (
+                    {userInfoQuery.data.projects.list.map((project) => (
                       <li key={project.id}>
                         <Link
                           to={`/project/${project.id}`}
@@ -201,7 +194,7 @@ function Search() {
                                       key={badge.image}
                                     />
                                   </div>
-                                ))} */}
+                                ))} 
                                 </div>
                               </div>
                               <h3 className='flex items-baseline px-0.5'>
@@ -281,7 +274,6 @@ function Search() {
                                 </span>
                               </div>
                               <div className='text-md mt-1 px-1'>
-                                {/* {project.description} */}
                               </div>
                             </div>
                           </div>
@@ -290,7 +282,7 @@ function Search() {
                     ))}
                   </ul>
                   <Link
-                    to={`/project/search?q=${query}`}
+                    to={`/project/search?q=${username}`}
                     className='flex justify-center w-1/4 text-lg text-blue-600 font-semibold mx-auto mt-6 py-1.5 bg-blue-50 shadow shadow-blue-100 rounded-xl'
                   >
                     더보기
@@ -299,12 +291,12 @@ function Search() {
               )}
           </motion.section>
           <motion.section variants={FADE_DOWN_ANIMATION_VARIANTS}>
-            {searchQuery.data?.discuss?.list &&
-              searchQuery.data.discuss.list.length > 0 && (
+            {userInfoQuery.data?.discuss?.list &&
+              userInfoQuery.data.discuss.list.length > 0 && (
                 <>
                   <h2 className='text-2xl font-bold mb-2'>커뮤니티</h2>
                   <ul className='grid gap-3'>
-                    {searchQuery.data.discuss.list.map((discuss) => (
+                    {userInfoQuery.data.discuss.list.map((discuss) => (
                       <li key={discuss.id}>
                         <Link
                           to={`/discuss/${discuss.id}`}
@@ -315,7 +307,7 @@ function Search() {
                               <h3 className='flex items-baseline'>
                                 <div className='flex flex-col my-0.5 pt-3'>
                                   <span className='text-blue-500 text-[15px] font-semibold leading-4 tracking-tighter'>
-                                    {getCategory(discuss.category)}
+                                    w
                                   </span>
                                   <span className='text-lg font-bold line-clamp-1'>
                                     {discuss.title}
@@ -406,7 +398,6 @@ function Search() {
                                 </div>
                               </div>
                               <div className='text-md mt-1 px-1'>
-                                {/* {project.description} */}
                               </div>
                             </div>
                           </div>
@@ -415,18 +406,18 @@ function Search() {
                     ))}
                   </ul>
                   <Link
-                    to={`/discuss/search?q=${query}`}
+                    to={`/discuss/search?q=${username}`}
                     className='flex justify-center w-1/4 text-lg text-blue-600 font-semibold mx-auto mt-6 py-1.5 bg-blue-50 shadow shadow-blue-100 rounded-xl'
                   >
                     더보기
                   </Link>
                 </>
               )}
-          </motion.section>
+          </motion.section> */}
         </motion.div>
       </motion.div>
     </>
   );
 }
 
-export default Search;
+export default User;

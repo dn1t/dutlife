@@ -8,13 +8,15 @@ import { trpc } from './utils/trpc';
 
 import Index from './pages';
 import Search from './pages/search';
+import User from './pages/user';
 
 import './fonts.css';
 import './index.css';
 
 const router = createBrowserRouter([
-  { path: '/', element: <Index /> },
+  { path: '/', element: <Index />, index: true },
   { path: '/search', element: <Search /> },
+  { path: '/user/:username', element: <User /> },
 ]);
 
 function App() {
@@ -34,9 +36,7 @@ function App() {
 }
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
-  // <React.StrictMode>
   <AnimatePresence mode='wait'>
     <App />
   </AnimatePresence>,
-  // </React.StrictMode>
 );
