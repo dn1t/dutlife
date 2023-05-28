@@ -12,11 +12,17 @@ import User from './pages/user';
 
 import './fonts.css';
 import './index.css';
+import RootComponent from './components/layout/RootComponent';
 
 const router = createBrowserRouter([
-  { path: '/', element: <Index />, index: true },
-  { path: '/search', element: <Search /> },
-  { path: '/user/:username', element: <User /> },
+  {
+    element: <RootComponent />,
+    children: [
+      { path: '/', element: <Index />, index: true },
+      { path: '/search', element: <Search /> },
+      { path: '/user/:username', element: <User /> },
+    ],
+  },
 ]);
 
 function App() {

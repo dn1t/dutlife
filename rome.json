@@ -5,7 +5,8 @@
     "rules": {
       "recommended": true,
       "suspicious": {
-        "noExplicitAny": "off"
+        "noExplicitAny": "off",
+        "noAssignInExpressions": "off"
       },
       "style": {
         "noParameterAssign": "off"
