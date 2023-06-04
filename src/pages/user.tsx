@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useLocation, useParams, useSearchParams } from 'react-router-dom';
 import { motion, useAnimationControls } from 'framer-motion';
 import { Scrollbars } from 'react-custom-scrollbars-2';
@@ -52,7 +52,7 @@ function User() {
   const [searchParams] = useSearchParams();
   const controls = useAnimationControls();
   const [open, setOpen] = useState(false);
-  const [shortUrl, setShortUrl] = useState('');
+  const [shortUrl, setShortUrl] = useState<string>();
 
   const userInfoQuery = trpc.userInfo.useQuery({ username });
   const user:
@@ -161,16 +161,18 @@ function User() {
                   (e.target as HTMLInputElement).value.length,
                 )
               }
-              value={shortUrl}
+              value={shortUrl ?? 'URL 생성 중...'}
               readOnly
             />
             <button
               type='button'
               className='flex items-center bg-blue-50 text-blue-600 font-medium w-max px-3 py-1.5 rounded-lg shadow shadow-blue-100'
               onClick={() => {
+                if (!shortUrl) return;
                 copy(shortUrl);
                 toast.success('링크를 클립보드에 복사했습니다!');
               }}
+              disabled={!shortUrl}
             >
               <DocumentDuplicateIcon className='w-5 h-5 mr-1.5' />
               <span className='whitespace-nowrap'>복사</span>
@@ -267,14 +269,15 @@ function User() {
                 type='button'
                 className='flex items-center bg-blue-50 text-blue-600 font-medium w-max mt-2 ml-auto px-3 py-1.5 rounded-lg shadow shadow-blue-100'
                 data-tooltip-id='share-tooltip'
-                onClick={() => {
-                  trpcQueryClient.shorten
-                    .query({ url: location.href })
-                    .then((res) => {
-                      setShortUrl(res);
-                      setOpen(true);
-                    });
-                }}
+                onClick={useCallback(() => {
+                  setOpen(true);
+                  if (!shortUrl)
+                    trpcQueryClient.shorten
+                      .query({ url: location.href })
+                      .then((res) => {
+                        setShortUrl(res);
+                      });
+                }, [shortUrl])}
               >
                 <ShareIcon className='w-5 h-5 mr-1.5' />
                 <span className='whitespace-nowrap'>링크 공유</span>
