@@ -314,24 +314,32 @@ function User() {
         >
           <h2 className='flex items-center text-2xl font-bold mb-2'>정보</h2>
           <div className='grid grid-cols-5 gap-3'>
-            <Card
-              label='전체 작품'
-              amount={user ? user.projects.length + user.privateProjects : 0}
-            />
-            <Card
-              label='인기 작품'
-              amount={
-                user?.projects.filter((project) => project.ranked).length ?? 0
-              }
-            />
-            <Card
-              label='스태프 선정 작품'
-              amount={
-                user?.projects.filter((project) => project.staffPicked)
-                  .length ?? 0
-              }
-            />
-            <Card label='비공개 작품' amount={user?.privateProjects ?? 0} />
+            <motion.div layoutId='card-1'>
+              <Card
+                label='전체 작품'
+                amount={user ? user.projects.length + user.privateProjects : 0}
+              />
+            </motion.div>
+            <motion.div layoutId='card-2'>
+              <Card
+                label='인기 작품'
+                amount={
+                  user?.projects.filter((project) => project.ranked).length ?? 0
+                }
+              />
+            </motion.div>
+            <motion.div layoutId='card-3'>
+              <Card
+                label='스태프 선정 작품'
+                amount={
+                  user?.projects.filter((project) => project.staffPicked)
+                    .length ?? 0
+                }
+              />
+            </motion.div>
+            <motion.div layoutId='card-4'>
+              <Card label='비공개 작품' amount={user?.privateProjects ?? 0} />
+            </motion.div>
             <Card label='dut.life 순위' amount={'-'} />
             <Card
               label='총 조회수'

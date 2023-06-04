@@ -1,3 +1,4 @@
+import { motion } from 'framer-motion';
 import {
   Link,
   useLocation,
@@ -16,7 +17,10 @@ function RootComponent() {
     <div className='flex flex-col min-h-screen'>
       <Nav query={query} mainPage={pathname === '/'} />
       <div className='flex-1'>{outlet}</div>
-      <footer className='flex flex-col items-center justify-center bg-zinc-100 py-8'>
+      <motion.footer
+        className='flex flex-col items-center justify-center bg-zinc-100 py-8'
+        layoutId='footer'
+      >
         <div className='flex max-w-5xl w-full'>
           <div className='w-full mr-auto mt-2'>
             <Link
@@ -81,7 +85,7 @@ function RootComponent() {
             </ul>
           </div>
         </div>
-      </footer>
+      </motion.footer>
     </div>
   );
 }

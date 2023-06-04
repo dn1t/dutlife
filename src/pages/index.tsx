@@ -43,7 +43,7 @@ function Index() {
       </section>
       <section className='max-w-5xl mx-auto'>
         <div className='grid grid-cols-4 gap-x-4'>
-          <div className='bg-emerald-50 rounded-3xl'>
+          <motion.div className='bg-emerald-50 rounded-3xl' layoutId='card-1'>
             <div className='flex items-center justify-between p-[30px]'>
               <h3 className='text-lg font-semibold leading-5'>
                 한 눈에 보는
@@ -53,8 +53,8 @@ function Index() {
               <ChartBarIcon className='w-7 h-7 fill-emerald-600' />
             </div>
             <img src='https://juso.io/images/landing-1.png' alt='' />
-          </div>
-          <div className='bg-blue-50 rounded-3xl'>
+          </motion.div>
+          <motion.div className='bg-blue-50 rounded-3xl' layoutId='card-2'>
             <div className='flex items-center justify-between p-[30px]'>
               <h3 className='text-lg font-semibold leading-5'>
                 실시간으로 보는
@@ -64,8 +64,8 @@ function Index() {
               <ChatBubbleLeftIcon className='w-7 h-7 fill-blue-600' />
             </div>
             <img src='https://juso.io/images/landing-1.png' alt='' />
-          </div>
-          <div className='bg-violet-50 rounded-3xl'>
+          </motion.div>
+          <motion.div className='bg-violet-50 rounded-3xl' layoutId='card-3'>
             <div className='flex items-center justify-between p-[30px]'>
               <h3 className='text-lg font-semibold leading-5'>
                 훨씬 빠른
@@ -75,8 +75,8 @@ function Index() {
               <BoltIcon className='w-7 h-7 fill-violet-600' />
             </div>
             <img src='https://juso.io/images/landing-1.png' alt='' />
-          </div>
-          <div className='bg-rose-50 rounded-3xl'>
+          </motion.div>
+          <motion.div className='bg-rose-50 rounded-3xl' layoutId='card-4'>
             <div className='flex items-center justify-between p-[30px]'>
               <h3 className='text-lg font-semibold leading-5'>
                 엔트리가 편리해지는
@@ -86,7 +86,7 @@ function Index() {
               <DaisyIcon className='w-7 h-7 fill-rose-600' />
             </div>
             <img src='https://juso.io/images/landing-1.png' alt='' />
-          </div>
+          </motion.div>
         </div>
       </section>
     </>
