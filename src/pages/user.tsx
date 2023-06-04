@@ -1,10 +1,18 @@
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useLocation, useParams, useSearchParams } from 'react-router-dom';
 import { motion, useAnimationControls } from 'framer-motion';
-import { ArrowTopRightOnSquareIcon } from '@heroicons/react/20/solid';
+import { Scrollbars } from 'react-custom-scrollbars-2';
+import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
+import { Doughnut } from 'react-chartjs-2';
+import ChartDataLabels from 'chartjs-plugin-datalabels';
+import {
+  ArrowTopRightOnSquareIcon,
+  InformationCircleIcon,
+} from '@heroicons/react/20/solid';
 import { trpc } from '../utils/trpc';
 import { FADE_DOWN_ANIMATION_VARIANTS } from '../utils/constants';
 import Card from '../components/user/Card';
+import Timeline, { EventType } from '../components/user/Timeline';
 
 function getRole(code: string) {
   switch (code) {
@@ -20,6 +28,14 @@ function getRole(code: string) {
       return code;
   }
 }
+
+ChartJS.register(ArcElement, Tooltip, Legend, ChartDataLabels);
+
+const MAX_PROJECT_RANK = 12;
+const VIEW_WEIGHT = 0.02;
+const LIKE_WEIGHT = 1;
+const COMMENT_WEIGHT = 1.1;
+const REMAKE_WEIGHT = 5;
 
 function User() {
   const { state } = useLocation();
@@ -56,10 +72,48 @@ function User() {
           views: number;
           likes: number;
           comments: number;
+          remakes: number;
         }[];
       }
     | undefined = userInfoQuery.data ?? state?.userInfo;
   const joinedDate = user ? new Date(user.joined) : new Date();
+  const projectRank = useMemo(() => {
+    if (!userInfoQuery.data) return [];
+
+    const data = userInfoQuery.data.projects
+      .map((p) => ({
+        name: p.name,
+        amount: Math.ceil(
+          p.views * VIEW_WEIGHT +
+            p.likes * LIKE_WEIGHT +
+            p.comments * COMMENT_WEIGHT +
+            p.remakes * REMAKE_WEIGHT,
+        ),
+      }))
+      .sort((a, b) => b.amount - a.amount);
+
+    const tmp: { name: string; amount: number }[] = [];
+
+    if (data.length > MAX_PROJECT_RANK) {
+      const etc = data
+        .slice(MAX_PROJECT_RANK - 1)
+        .reduce((prev, curr) => prev + curr.amount, 0);
+      const etcItem = { name: '기타', amount: etc };
+
+      tmp.push(
+        ...data
+          .slice(0, MAX_PROJECT_RANK - 1)
+          .map((p) => ({ name: p.name, amount: p.amount })),
+        etcItem,
+      );
+    } else tmp.push(...data.map((p) => ({ name: p.name, amount: p.amount })));
+
+    return tmp;
+  }, [userInfoQuery.data]);
+  const projectRankSum = useMemo(
+    () => projectRank.reduce((prev, curr) => prev + curr.amount, 0),
+    [projectRank],
+  );
 
   useEffect(() => {
     if (!userInfoQuery.data) return;
@@ -194,7 +248,7 @@ function User() {
           className='flex flex-col w-full max-w-4xl h-max mx-auto'
           variants={FADE_DOWN_ANIMATION_VARIANTS}
         >
-          <h2 className='text-2xl font-bold mb-2'>정보</h2>
+          <h2 className='flex items-center text-2xl font-bold mb-2'>정보</h2>
           <div className='grid grid-cols-5 gap-3'>
             <Card
               label='전체 작품'
@@ -214,7 +268,7 @@ function User() {
               }
             />
             <Card label='비공개 작품' amount={user?.privateProjects ?? 0} />
-            <Card label='수상 배지' amount={user?.badges.length ?? 0} />
+            <Card label='dut.life 순위' amount={'-'} />
             <Card
               label='총 조회수'
               amount={
@@ -242,9 +296,154 @@ function User() {
                 ) ?? 0
               }
             />
+            <Card
+              label='총 리메이크 수'
+              amount={
+                user?.projects.reduce(
+                  (prev, curr) => (prev += curr.remakes),
+                  0,
+                ) ?? 0
+              }
+            />
             <Card label='가입' amount={joinedDate.getFullYear().toString()} />
           </div>
         </motion.section>
+        <div className='flex w-full max-w-4xl mx-auto'>
+          <motion.section
+            className='flex flex-col w-full mx-auto'
+            variants={FADE_DOWN_ANIMATION_VARIANTS}
+          >
+            <h2 className='flex items-center text-2xl font-bold mb-2'>
+              인기도
+              <div className='group'>
+                <InformationCircleIcon className='h-5 w-5 text-zinc-400 ml-0.5' />
+                <div className='relative invisible opacity-0 group-hover:visible group-hover:opacity-100 group-focus:visible group-focus:opacity-100 transition-all duration-300'>
+                  <div className='absolute w-max bg-white border border-zinc-100 shadow text-sm font-normal px-2 py-1 rounded-r-lg rounded-b-lg left-6 -top-3 max-w-[15rem]'>
+                    인기도는 조회수, 좋아요, 댓글, 리메이크에 각각{' '}
+                    <span className='[font-feature-settings:_"tnum",_"zero"]'>
+                      0.02
+                    </span>
+                    ,{' '}
+                    <span className='[font-feature-settings:_"tnum",_"zero"]'>
+                      1
+                    </span>
+                    ,{' '}
+                    <span className='[font-feature-settings:_"tnum",_"zero"]'>
+                      1.1
+                    </span>
+                    ,{' '}
+                    <span className='[font-feature-settings:_"tnum",_"zero"]'>
+                      5
+                    </span>
+                    의 가중치를 곱해 더한 값입니다.
+                  </div>
+                </div>
+              </div>
+            </h2>
+            <Doughnut
+              data={{
+                labels: projectRank.map((p) => p.name),
+                datasets: [
+                  {
+                    data: projectRank.map((p) => p.amount),
+                    backgroundColor: [
+                      'rgba(255, 99, 132, 0.2)',
+                      'rgba(54, 162, 235, 0.2)',
+                      'rgba(255, 206, 86, 0.2)',
+                      'rgba(75, 192, 192, 0.2)',
+                      'rgba(153, 102, 255, 0.2)',
+                      'rgba(255, 159, 64, 0.2)',
+                    ],
+                  },
+                ],
+              }}
+              options={{
+                plugins: {
+                  legend: {
+                    position: 'bottom',
+                    labels: {
+                      font: { family: 'Pretendard Variable', size: 12 },
+                    },
+                  },
+                  datalabels: {
+                    font: { family: 'Pretendard Variable', size: 14 },
+                  },
+                  tooltip: {
+                    titleFont: {
+                      family: 'Pretendard Variable',
+                      size: 13,
+                      weight: '500',
+                    },
+                    bodyFont: { family: 'Pretendard Variable', size: 12 },
+                    callbacks: {
+                      label: (item) =>
+                        `${item.parsed} (${(
+                          (item.parsed / projectRankSum) *
+                          100
+                        ).toFixed(2)}%)`,
+                    },
+                  },
+                },
+              }}
+            />
+          </motion.section>
+          <motion.section
+            className='flex flex-col w-full mx-auto'
+            variants={FADE_DOWN_ANIMATION_VARIANTS}
+          >
+            <h2 className='text-2xl font-bold mb-2'>활동</h2>
+            <div className='bg-zinc-50 rounded-2xl shadow basis-0 [flex-grow:_1] py-3'>
+              <Scrollbars
+                renderThumbVertical={(props) => (
+                  <div
+                    {...props}
+                    className='bg-zinc-300 rounded-full relative right-2.5'
+                    style={{ width: 8 }}
+                  />
+                )}
+              >
+                <div className='px-5 py-3'>
+                  <Timeline
+                    events={
+                      userInfoQuery.data
+                        ? [
+                            {
+                              type: EventType.JOINED_ENTRY,
+                              date: userInfoQuery.data.joined,
+                              args: [userInfoQuery.data.username],
+                            },
+                            ...userInfoQuery.data.projects.map((p) => ({
+                              type: EventType.CREATED_PROJECT,
+                              date: p.created,
+                              args: [p.name],
+                            })),
+                            ...userInfoQuery.data.projects
+                              .filter((p) => p.ranked)
+                              .map((p) => ({
+                                type: EventType.PROJECT_RANKED,
+                                date: p.ranked,
+                                args: [p.name],
+                              })),
+                            ...userInfoQuery.data.projects
+                              .filter((p) => p.staffPicked)
+                              .map((p) => ({
+                                type: EventType.PROJECT_STAFF_PICKED,
+                                date: p.staffPicked,
+                                args: [p.name],
+                              })),
+                          ].sort(
+                            (a, b) =>
+                              new Date(b.date ?? 0).valueOf() -
+                              new Date(a.date ?? 0).valueOf(),
+                          )
+                        : []
+                    }
+                  />
+                </div>
+              </Scrollbars>
+            </div>
+          </motion.section>
+        </div>
       </motion.div>
     </motion.div>
   );
