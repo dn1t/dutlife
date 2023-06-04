@@ -4,6 +4,7 @@ import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import { AnimatePresence } from 'framer-motion';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { httpBatchLink } from '@trpc/client';
+import { Toaster } from 'react-hot-toast';
 import { trpc } from './utils/trpc';
 
 import Index from './pages';
@@ -35,6 +36,7 @@ function App() {
   return (
     <trpc.Provider client={trpcClient} queryClient={queryClient}>
       <QueryClientProvider client={queryClient}>
+        <Toaster />
         <RouterProvider router={router} />
       </QueryClientProvider>
     </trpc.Provider>

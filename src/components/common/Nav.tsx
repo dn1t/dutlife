@@ -22,7 +22,7 @@ function Nav({
 
   return (
     <nav
-      className={`w-full h-[72px] bg-white/70 backdrop-blur-xl sticky top-0 z-[999] ${
+      className={`w-full h-[72px] bg-white/70 backdrop-blur-xl sticky top-0 z-[997] ${
         !onTop ? 'shadow' : ''
       }`}
     >

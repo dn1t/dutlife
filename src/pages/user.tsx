@@ -1,18 +1,27 @@
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useLocation, useParams, useSearchParams } from 'react-router-dom';
 import { motion, useAnimationControls } from 'framer-motion';
 import { Scrollbars } from 'react-custom-scrollbars-2';
-import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
+import { Tooltip } from 'react-tooltip';
+import {
+  Chart as ChartJS,
+  ArcElement,
+  Tooltip as ChartTooltip,
+  Legend,
+} from 'chart.js';
 import { Doughnut } from 'react-chartjs-2';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 import {
-  ArrowTopRightOnSquareIcon,
+  DocumentDuplicateIcon,
   InformationCircleIcon,
+  ShareIcon,
 } from '@heroicons/react/20/solid';
-import { trpc } from '../utils/trpc';
+import { trpc, trpcQueryClient } from '../utils/trpc';
 import { FADE_DOWN_ANIMATION_VARIANTS } from '../utils/constants';
 import Card from '../components/user/Card';
 import Timeline, { EventType } from '../components/user/Timeline';
+import copy from 'copy-to-clipboard';
+import { toast } from 'react-hot-toast';
 
 function getRole(code: string) {
   switch (code) {
@@ -29,7 +38,7 @@ function getRole(code: string) {
   }
 }
 
-ChartJS.register(ArcElement, Tooltip, Legend, ChartDataLabels);
+ChartJS.register(ArcElement, ChartTooltip, Legend, ChartDataLabels);
 
 const MAX_PROJECT_RANK = 12;
 const VIEW_WEIGHT = 0.02;
@@ -42,6 +51,8 @@ function User() {
   const { username } = useParams();
   const [searchParams] = useSearchParams();
   const controls = useAnimationControls();
+  const [open, setOpen] = useState(false);
+  const [shortUrl, setShortUrl] = useState('');
 
   const userInfoQuery = trpc.userInfo.useQuery({ username });
   const user:
@@ -127,6 +138,49 @@ function User() {
 
   return (
     <motion.div className='flex flex-col items-start' layoutId='container'>
+      <div
+        className={`w-screen h-screen fixed top-0 left-0 bg-black/40 z-[998] transition-all duration-100 ${
+          open ? 'visible opacity-100' : 'invisible opacity-0'
+        }`}
+        onClick={() => setOpen(false)}
+      />
+      <div
+        className={`flex items-center justify-center w-screen h-screen fixed top-0 left-0 z-[999] pointer-events-none transition-all duration-100 ${
+          open ? 'visible opacity-100' : 'invisible opacity-0'
+        }`}
+      >
+        <div className='bg-white rounded-3xl px-[18px] pt-6 pb-3 pointer-events-auto'>
+          <h3 className='text-[22px] font-bold leading-5 px-1.5'>링크 공유</h3>
+          <div className='flex gap-x-2 mt-3'>
+            <input
+              type='url'
+              className='bg-zinc-50 text-lg px-4 py-1.5 shadow rounded-xl'
+              onClick={(e) =>
+                (e.target as HTMLInputElement).setSelectionRange(
+                  0,
+                  (e.target as HTMLInputElement).value.length,
+                )
+              }
+              value={shortUrl}
+              readOnly
+            />
+            <button
+              type='button'
+              className='flex items-center bg-blue-50 text-blue-600 font-medium w-max px-3 py-1.5 rounded-lg shadow shadow-blue-100'
+              onClick={() => {
+                copy(shortUrl);
+                toast.success('링크를 클립보드에 복사했습니다!');
+              }}
+            >
+              <DocumentDuplicateIcon className='w-5 h-5 mr-1.5' />
+              <span className='whitespace-nowrap'>복사</span>
+            </button>
+          </div>
+          <div className='text-zinc-500 text-[15px] font-medium px-1.5 mt-3'>
+            위 링크를 복사해 엔트리 커뮤니티에 공유하세요.
+          </div>
+        </div>
+      </div>
       <motion.div
         className='flex flex-col w-full gap-y-7 pb-10'
         initial={state?.userInfo ? 'show' : 'hidden'}
@@ -209,15 +263,22 @@ function User() {
               <span className='text-2xl text-zinc-500 font-medium ml-2'>
                 @{user?.username}
               </span>
-              <a
-                href={`https://playentry.org/profile/${user?.id}`}
-                target='_blank'
-                rel='noreferrer'
-                className='flex self-stretch items-center bg-blue-50 text-blue-600 font-medium mt-p ml-auto px-3 rounded-lg shadow shadow-blue-100'
+              <button
+                type='button'
+                className='flex items-center bg-blue-50 text-blue-600 font-medium w-max mt-2 ml-auto px-3 py-1.5 rounded-lg shadow shadow-blue-100'
+                data-tooltip-id='share-tooltip'
+                onClick={() => {
+                  trpcQueryClient.shorten
+                    .query({ url: location.href })
+                    .then((res) => {
+                      setShortUrl(res);
+                      setOpen(true);
+                    });
+                }}
               >
-                <ArrowTopRightOnSquareIcon className='w-5 h-5 mr-1' />
-                <span className='whitespace-nowrap'>마이페이지</span>
-              </a>
+                <ShareIcon className='w-5 h-5 mr-1.5' />
+                <span className='whitespace-nowrap'>링크 공유</span>
+              </button>
             </motion.h3>
             <motion.div
               className='flex gap-x-2'
@@ -316,28 +377,32 @@ function User() {
             <h2 className='flex items-center text-2xl font-bold mb-2'>
               인기도
               <div className='group'>
-                <InformationCircleIcon className='h-5 w-5 text-zinc-400 ml-0.5' />
-                <div className='relative invisible opacity-0 group-hover:visible group-hover:opacity-100 group-focus:visible group-focus:opacity-100 transition-all duration-300'>
-                  <div className='absolute w-max bg-white border border-zinc-100 shadow text-sm font-normal px-2 py-1 rounded-r-lg rounded-b-lg left-6 -top-3 max-w-[15rem]'>
-                    인기도는 조회수, 좋아요, 댓글, 리메이크에 각각{' '}
-                    <span className='[font-feature-settings:_"tnum",_"zero"]'>
-                      0.02
-                    </span>
-                    ,{' '}
-                    <span className='[font-feature-settings:_"tnum",_"zero"]'>
-                      1
-                    </span>
-                    ,{' '}
-                    <span className='[font-feature-settings:_"tnum",_"zero"]'>
-                      1.1
-                    </span>
-                    ,{' '}
-                    <span className='[font-feature-settings:_"tnum",_"zero"]'>
-                      5
-                    </span>
-                    의 가중치를 곱해 더한 값입니다.
-                  </div>
-                </div>
+                <InformationCircleIcon
+                  className='h-5 w-5 text-zinc-400 ml-0.5'
+                  data-tooltip-id='popularity-tooltip'
+                />
+                <Tooltip
+                  id='popularity-tooltip'
+                  className='text-sm font-normal'
+                >
+                  인기도는 조회수, 좋아요, 댓글, 리메이크에 각각{' '}
+                  <span className='[font-feature-settings:_"tnum",_"zero"]'>
+                    0.02
+                  </span>
+                  ,{' '}
+                  <span className='[font-feature-settings:_"tnum",_"zero"]'>
+                    1
+                  </span>
+                  ,{' '}
+                  <span className='[font-feature-settings:_"tnum",_"zero"]'>
+                    1.1
+                  </span>
+                  ,{' '}
+                  <span className='[font-feature-settings:_"tnum",_"zero"]'>
+                    5
+                  </span>
+                  의 가중치를 곱해 더한 값입니다.
+                </Tooltip>
               </div>
             </h2>
             <Doughnut

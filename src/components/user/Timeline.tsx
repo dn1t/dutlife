@@ -90,7 +90,9 @@ function Timeline({
               );
               break;
             default:
-              label = '지원하지 않는 활동입니다';
+              label = (
+                <span className='text-zinc-500'>지원하지 않는 활동입니다</span>
+              );
               icon = (
                 <div className='flex items-center justify-center shrink-0 bg-blue-100/70 w-9 h-9 rounded-full'>
                   <UserIcon className='w-5 h-5 text-blue-600' />
@@ -99,7 +101,7 @@ function Timeline({
           }
 
           return (
-            <li className='flex gap-x-3'>
+            <li className='flex gap-x-3' key={event.date}>
               {icon}
               <div className='flex flex-col'>
                 <div className='text-zinc-500 text-[15px] leading-4 [font-feature-settings:_"tnum"]'>

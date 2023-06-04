@@ -17,6 +17,7 @@
     "@trpc/server": "^10.27.1",
     "chart.js": "^4.3.0",
     "chartjs-plugin-datalabels": "^2.2.0",
+    "copy-to-clipboard": "^3.3.3",
     "dotenv": "^16.0.3",
     "express": "^4.18.2",
     "fetch-cookie": "^2.1.0",
@@ -25,7 +26,9 @@
     "react-chartjs-2": "^5.2.0",
     "react-custom-scrollbars-2": "^4.5.0",
     "react-dom": "^18.2.0",
+    "react-hot-toast": "^2.4.1",
     "react-router-dom": "^6.10.0",
+    "react-tooltip": "^5.13.1",
     "tough-cookie": "^4.1.2",
     "tough-cookie-file-store": "^2.0.3",
     "vite-plugin-svgr": "^2.4.0"

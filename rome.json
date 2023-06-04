@@ -10,6 +10,10 @@
       },
       "style": {
         "noParameterAssign": "off"
+      },
+      "a11y": {
+        "useKeyWithClickEvents": "off",
+        "useKeyWithMouseEvents": "off"
       }
     }
   },
