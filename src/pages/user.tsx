@@ -126,6 +126,14 @@ function User() {
     [projectRank],
   );
 
+  const shareButtonHandler = useCallback(() => {
+    setOpen(true);
+    if (!shortUrl)
+      trpcQueryClient.shorten.query({ url: location.href }).then((res) => {
+        setShortUrl(res);
+      });
+  }, [shortUrl]);
+
   useEffect(() => {
     if (!userInfoQuery.data) return;
     if (state?.userInfo) {
@@ -149,12 +157,12 @@ function User() {
           open ? 'visible opacity-100' : 'invisible opacity-0'
         }`}
       >
-        <div className='bg-white rounded-3xl px-[18px] pt-6 pb-3 pointer-events-auto shadow-xl'>
+        <div className='bg-white max-w-[calc(100vw_-_1rem)] rounded-3xl px-[18px] pt-6 pb-3 pointer-events-auto shadow-xl'>
           <h3 className='text-[22px] font-bold leading-5 px-1.5'>링크 공유</h3>
           <div className='flex gap-x-2 mt-3'>
             <input
               type='url'
-              className='bg-zinc-50 text-lg px-4 py-1.5 shadow rounded-xl'
+              className='bg-zinc-50 text-lg w-full px-4 py-1.5 shadow rounded-xl'
               onClick={(e) =>
                 (e.target as HTMLInputElement).setSelectionRange(
                   0,
@@ -198,21 +206,21 @@ function User() {
           variants={FADE_DOWN_ANIMATION_VARIANTS}
         >
           <motion.div
-            className='w-full h-44 bg-center bg-[auto_105%] bg-[#16d8a3] brightness-75'
+            className='w-full h-44 2xs:h-32 bg-center bg-[auto_105%] bg-[#16d8a3] brightness-75'
             style={{
               backgroundImage: `url(${user?.coverImage})`,
             }}
             layoutId={`user_${username}_coverImage`}
           />
-          <div className='flex flex-col w-full max-w-4xl h-max mx-auto pb-3'>
-            <div className='relative mb-6'>
+          <div className='flex flex-col w-full max-w-4xl h-max mx-auto px-4 pb-3'>
+            <div className='relative mb-6 lg:px-2'>
               <motion.img
                 src={
                   user?.profileImage ??
                   'https://playentry.org/img/DefaultCardUserThmb.svg'
                 }
                 alt={`${user?.nickname}의 프로필 사진`}
-                className='w-24 h-24 rounded-full absolute -top-16 outline outline-4 outline-zinc-50 object-cover'
+                className='w-24 h-24 ssm:w-[88px] ssm:h-[88px] rounded-full absolute -top-16 ssm:-top-14 outline outline-4 outline-zinc-50 object-cover'
                 height={96}
                 width={96}
                 layoutId={`user_${username}_profileImage`}
@@ -224,7 +232,10 @@ function User() {
                 layoutId={`user_${username}_badges`}
               >
                 {user?.badges.map((badge) => (
-                  <div className='w-[36px] aspect-[68/116]' key={badge.image}>
+                  <div
+                    className='w-9 ssm:w-8 aspect-[68/116]'
+                    key={badge.image}
+                  >
                     <img
                       src={badge.image}
                       alt={badge.label}
@@ -235,7 +246,7 @@ function User() {
               </motion.div>
             </div>
             <motion.div
-              className='flex gap-1.5 mt-4'
+              className='flex gap-1.5 mt-4 lg:px-2'
               layoutId={`user_${username}_tags`}
             >
               <div
@@ -249,71 +260,74 @@ function User() {
                       ? 'bg-violet-100/60 text-violet-600'
                       : 'bg-amber-100/60 text-amber-600'
                     : ''
-                } text-[15px] font-medium px-3 py-px w-max rounded-full`}
+                } text-[15px] ssm:text-sm font-medium px-3 ssm:px-2.5 py-px w-max rounded-full`}
               >
                 {user && getRole(user.role)}
               </div>
-              <div className='flex bg-zinc-100/70 text-zinc-600 text-[15px] font-medium px-3 py-px w-max rounded-full'>
+              <div className='flex bg-zinc-100/70 text-zinc-600 text-[15px] ssm:text-sm font-medium px-3 ssm:px-2.5 py-px w-max rounded-full'>
                 dut.life 비회원
               </div>
             </motion.div>
             <motion.h3
-              className='flex items-baseline mt-1'
+              className='flex items-baseline mt-1 lg:px-2'
               layoutId={`user_${username}_name`}
             >
-              <span className='text-3xl font-bold'>{user?.nickname}</span>
-              <span className='text-2xl text-zinc-500 font-medium ml-2'>
+              <span className='text-3xl 2xs:text-[26px] font-bold leading-9'>
+                {user?.nickname}
+              </span>
+              <span className='text-2xl 2xs:text-[22px] text-zinc-500 font-medium ml-1.5'>
                 @{user?.username}
               </span>
               <button
                 type='button'
-                className='flex items-center bg-blue-50 text-blue-600 font-medium w-max mt-2 ml-auto px-3 py-1.5 rounded-lg shadow shadow-blue-100'
+                className='flex ssm:hidden items-center bg-blue-50 text-blue-600 font-medium w-max ml-auto px-3 py-1.5 rounded-lg shadow shadow-blue-100'
                 data-tooltip-id='share-tooltip'
-                onClick={useCallback(() => {
-                  setOpen(true);
-                  if (!shortUrl)
-                    trpcQueryClient.shorten
-                      .query({ url: location.href })
-                      .then((res) => {
-                        setShortUrl(res);
-                      });
-                }, [shortUrl])}
+                onClick={shareButtonHandler}
               >
                 <ShareIcon className='w-5 h-5 mr-1.5' />
                 <span className='whitespace-nowrap'>링크 공유</span>
               </button>
             </motion.h3>
             <motion.div
-              className='flex gap-x-2'
+              className='flex gap-x-2 text-[17px] ssm:text-base lg:px-2'
               layoutId={`user_${username}_follows`}
             >
               <span>
-                <span className='text-zinc-500 text-[17px]'>팔로잉&nbsp;</span>
-                <span className='text-blue-500 text-[17px] font-medium'>
+                <span className='text-zinc-500'>팔로잉&nbsp;</span>
+                <span className='text-blue-500 font-medium'>
                   {user?.followings}
                 </span>
               </span>
               <span>
-                <span className='text-zinc-500 text-[17px]'>팔로워&nbsp;</span>
-                <span className='text-blue-500 text-[17px] font-medium'>
+                <span className='text-zinc-500'>팔로워&nbsp;</span>
+                <span className='text-blue-500 font-medium'>
                   {user?.followers}
                 </span>
               </span>
             </motion.div>
             <motion.div
-              className='text-lg mt-1'
+              className='text-lg ssm:text-[17px] ssm:leading-6 mt-1 lg:px-2'
               layoutId={`user_${username}_description`}
             >
               {user?.description}
             </motion.div>
+            <button
+              type='button'
+              className='hidden ssm:flex items-center justify-center bg-blue-50 text-blue-600 font-medium w-full px-3 py-1.5 mt-2 rounded-lg shadow shadow-blue-100'
+              data-tooltip-id='share-tooltip'
+              onClick={shareButtonHandler}
+            >
+              <ShareIcon className='w-5 h-5 mr-2' />
+              <span className='whitespace-nowrap'>링크 공유</span>
+            </button>
           </div>
         </motion.section>
         <motion.section
-          className='flex flex-col w-full max-w-4xl h-max mx-auto'
+          className='flex flex-col w-full max-w-4xl h-max px-4 lg:px-6 mx-auto'
           variants={FADE_DOWN_ANIMATION_VARIANTS}
         >
           <h2 className='flex items-center text-2xl font-bold mb-2'>정보</h2>
-          <div className='grid grid-cols-5 gap-3'>
+          <div className='grid grid-cols-5 md:grid-cols-4 sm:grid-cols-3 xs:grid-cols-2 2.5xs:grid-cols-1 gap-3'>
             <motion.div layoutId='card-1'>
               <Card
                 label='전체 작품'
@@ -330,7 +344,7 @@ function User() {
             </motion.div>
             <motion.div layoutId='card-3'>
               <Card
-                label='스태프 선정 작품'
+                label='스태프 선정'
                 amount={
                   user?.projects.filter((project) => project.staffPicked)
                     .length ?? 0
@@ -380,9 +394,9 @@ function User() {
             <Card label='가입' amount={joinedDate.getFullYear().toString()} />
           </div>
         </motion.section>
-        <div className='flex w-full max-w-4xl mx-auto'>
+        <div className='grid grid-cols-2 md:grid-cols-1 w-full max-w-4xl mx-auto'>
           <motion.section
-            className='flex flex-col w-full mx-auto'
+            className='flex flex-col w-full px-4 lg:px-6 mx-auto'
             variants={FADE_DOWN_ANIMATION_VARIANTS}
           >
             <h2 className='flex items-center text-2xl font-bold mb-2'>
@@ -460,11 +474,11 @@ function User() {
             />
           </motion.section>
           <motion.section
-            className='flex flex-col w-full mx-auto'
+            className='flex flex-col w-full px-4 lg:px-6 mx-auto'
             variants={FADE_DOWN_ANIMATION_VARIANTS}
           >
             <h2 className='text-2xl font-bold mb-2'>활동</h2>
-            <div className='bg-zinc-50 rounded-2xl shadow basis-0 [flex-grow:_1] py-3'>
+            <div className='bg-zinc-50 rounded-2xl shadow aspect-square py-3'>
               <Scrollbars
                 renderThumbVertical={(props) => (
                   <div

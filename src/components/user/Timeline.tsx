@@ -19,7 +19,7 @@ function Timeline({
   return (
     <div>
       <ul className='flex flex-col gap-y-4'>
-        {events.map((event) => {
+        {events.map((event, i) => {
           const date = new Date(event.date ?? 0);
 
           let label: JSX.Element;
@@ -101,7 +101,7 @@ function Timeline({
           }
 
           return (
-            <li className='flex gap-x-3' key={event.date}>
+            <li className='flex gap-x-3' key={i.toString()}>
               {icon}
               <div className='flex flex-col'>
                 <div className='text-zinc-500 text-[15px] leading-4 [font-feature-settings:_"tnum"]'>

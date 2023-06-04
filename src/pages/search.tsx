@@ -37,7 +37,10 @@ function Search() {
   }, [searchQuery.data]);
 
   return (
-    <motion.div className='max-w-3xl mx-auto flex flex-col items-start'>
+    <motion.div
+      className='max-w-3xl mx-auto flex flex-col items-start px-4 lg:px-6'
+      layoutId='container'
+    >
       <motion.h2
         className='mb-4 text-lg text-black/70 text-center font-medium font-display leading-8'
         layoutId='subtitle'

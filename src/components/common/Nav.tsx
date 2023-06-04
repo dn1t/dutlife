@@ -22,15 +22,15 @@ function Nav({
 
   return (
     <nav
-      className={`w-full h-[72px] bg-white/70 backdrop-blur-xl sticky top-0 z-[997] ${
-        !onTop ? 'shadow' : ''
+      className={`w-full h-[72px] ssm:h-16 bg-white/70 backdrop-blur-xl sticky top-0 z-[997] ${
+        !onTop && !mainPage ? 'shadow' : ''
       }`}
     >
-      <section className='max-w-5xl h-full mx-auto flex items-center'>
+      <section className='max-w-5xl h-full mx-auto flex items-center px-4 lg:px-6'>
         {!mainPage && (
           <MotionLink
             to='/'
-            className='block text-2xl font-bold font-display leading-none'
+            className='block text-2xl font-bold font-display leading-none ssm:mx-auto'
             layoutId='logo'
           >
             dut.life
@@ -38,7 +38,7 @@ function Nav({
         )}
         {!mainPage && (
           <MotionForm
-            className='max-w-2xl w-full ml-12'
+            className='max-w-2xl w-full ml-12 ssm:hidden'
             action='/search'
             layoutId='searchForm'
           >

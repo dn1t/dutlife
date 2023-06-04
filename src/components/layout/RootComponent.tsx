@@ -21,7 +21,7 @@ function RootComponent() {
         className='flex flex-col items-center justify-center bg-zinc-100 py-8'
         layoutId='footer'
       >
-        <div className='flex max-w-5xl w-full'>
+        <div className='grid grid-cols-4 sm:grid-cols-2 gap-y-6 max-w-5xl lg:max-w-2xl w-full px-4 lg:px-6'>
           <div className='w-full mr-auto mt-2'>
             <Link
               to='/'
