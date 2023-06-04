@@ -149,7 +149,7 @@ function User() {
           open ? 'visible opacity-100' : 'invisible opacity-0'
         }`}
       >
-        <div className='bg-white rounded-3xl px-[18px] pt-6 pb-3 pointer-events-auto'>
+        <div className='bg-white rounded-3xl px-[18px] pt-6 pb-3 pointer-events-auto shadow-xl'>
           <h3 className='text-[22px] font-bold leading-5 px-1.5'>링크 공유</h3>
           <div className='flex gap-x-2 mt-3'>
             <input
