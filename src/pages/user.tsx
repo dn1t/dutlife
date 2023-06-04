@@ -380,32 +380,28 @@ function User() {
             <h2 className='flex items-center text-2xl font-bold mb-2'>
               인기도
               <div className='group'>
-                <InformationCircleIcon
-                  className='h-5 w-5 text-zinc-400 ml-0.5'
-                  data-tooltip-id='popularity-tooltip'
-                />
-                <Tooltip
-                  id='popularity-tooltip'
-                  className='text-sm font-normal'
-                >
-                  인기도는 조회수, 좋아요, 댓글, 리메이크에 각각{' '}
-                  <span className='[font-feature-settings:_"tnum",_"zero"]'>
-                    0.02
-                  </span>
-                  ,{' '}
-                  <span className='[font-feature-settings:_"tnum",_"zero"]'>
-                    1
-                  </span>
-                  ,{' '}
-                  <span className='[font-feature-settings:_"tnum",_"zero"]'>
-                    1.1
-                  </span>
-                  ,{' '}
-                  <span className='[font-feature-settings:_"tnum",_"zero"]'>
-                    5
-                  </span>
-                  의 가중치를 곱해 더한 값입니다.
-                </Tooltip>
+                <InformationCircleIcon className='h-5 w-5 text-zinc-400 ml-0.5' />
+                <div className='relative invisible opacity-0 group-hover:visible group-hover:opacity-100 group-focus:visible group-focus:opacity-100 transition-all duration-300 z-[996]'>
+                  <div className='absolute w-max bg-white border border-zinc-100 shadow text-sm font-normal px-2 py-1 rounded-r-lg rounded-b-lg left-6 -top-3 max-w-[15rem]'>
+                    인기도는 조회수, 좋아요, 댓글, 리메이크에 각각{' '}
+                    <span className='[font-feature-settings:_"tnum",_"zero"]'>
+                      0.02
+                    </span>
+                    ,{' '}
+                    <span className='[font-feature-settings:_"tnum",_"zero"]'>
+                      1
+                    </span>
+                    ,{' '}
+                    <span className='[font-feature-settings:_"tnum",_"zero"]'>
+                      1.1
+                    </span>
+                    ,{' '}
+                    <span className='[font-feature-settings:_"tnum",_"zero"]'>
+                      5
+                    </span>
+                    의 가중치를 곱해 더한 값입니다.
+                  </div>
+                </div>
               </div>
             </h2>
             <Doughnut
